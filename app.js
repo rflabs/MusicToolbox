@@ -29,6 +29,11 @@ app.post('/alexa', function(req, res) {
     Ayva.ExecuteRequest.FromAlexa(req.body, res);    
 })
 
+app.post('/auth', function(req, res) {
+    console.log("here")
+    console.log(req.body)
+})
+
 server.listen(process.env.PORT || 8080, function() {
 	console.log("Node server started")
 });
