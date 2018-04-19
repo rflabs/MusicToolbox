@@ -1,8 +1,7 @@
 var Welcome = function(Context){
     Context.assistant
-        .say("Hello! ")
+        .say("It's time for practice! I'll start a metronome, what song are you practicing?")
         .pause("400ms")
-        .say("Welcome to musicians toolbox.")
         .finish()
 }
 

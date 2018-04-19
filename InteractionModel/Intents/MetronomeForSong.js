@@ -14,7 +14,7 @@ var MetronomeForSong = {
         "Metronome for {'songTitle': 'Morning'} by {'artist': 'Beck'}",
         "Metronome for song {'songTitle': 'The Love You Save'} by {'artist': 'The Jackson 5'}",
 
-        
+        "{'songTitle':'Let It Be'}"
         
     ],
     slots: {
