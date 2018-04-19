@@ -5,7 +5,7 @@ var MetronomeForBPM = function(Context){
         .then( (bpmLink) => {
             Context.assistant.say(`Ok, starting a metronome at ${Context.args.bpm} beats per minute`)
             .play(bpmLink)
-            .finish()
+            .finish({"exit": true})
         })
         .catch( e => {
             console.log(e)
