@@ -1,5 +1,5 @@
 var MetronomeForSong = {
-    name: 'MetronomeForSong',
+    name: 'ImplicitInvocation',
     utterances: [
         "Start a metronome for song {'songTitle':'The Love You Save'}",
         "Start a metronome for song {'songTitle':'Let It Be'}",
