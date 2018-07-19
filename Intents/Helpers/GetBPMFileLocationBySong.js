@@ -2,23 +2,71 @@ var rp = require('request-promise');
 var GetBPMFileLocationByBPM = require('./GetBPMFileLocationByBPM');
 
 var GetBPMFileLocationBySong = function(Context){
+
     return new Promise((resolve, reject) => {
         getSpotifyCreds().then( res => {
             var access_token = res.access_token
-            getTrackId(Context.args.songTitle, Context.args.artist, access_token)
-                .then(res => {
-                    var track = JSON.parse(res).tracks.items[0]
-                    getBPMInfo(track, access_token)
-                        .then(trackAttributes =>{
-                            GetBPMFileLocationByBPM(JSON.parse(trackAttributes).tempo)
-                                .then(bpmLink => {
-                                    resolve({bpmLink,track})
+
+            if(Context.args.songTitle && Context.args.artist)
+            {
+                console.log(`Trying with  ${Context.args.songTitle} by artist ${Context.args.artist}`)
+                getTrackId(Context.args.songTitle, Context.args.artist, access_token)
+                    .then(res => {
+                        var track = JSON.parse(res).tracks.items[0]
+                        getBPMInfo(track, access_token)
+                            .then(trackAttributes =>{
+                                GetBPMFileLocationByBPM(JSON.parse(trackAttributes).tempo)
+                                    .then(bpmLink => {
+                                        resolve({bpmLink,track})
+                                    })
+                            })
+                    })
+            } else {
+                console.log("Trying with raw input: " + Context.rawInput)
+                getTrackId(Context.rawInput, "", access_token)
+                    .then(res => {
+                        var track = JSON.parse(res).tracks.items[0]
+                        if (!track)
+                        {
+                            var retryString = removeWordOrPhrase(Context.rawInput, "by")
+                            console.log("Retrying with: " + retryString)
+                            getTrackId(retryString, '', access_token)
+                                .then(res => {
+                                    var track = JSON.parse(res).tracks.items[0]
+                                    getBPMInfo(track, access_token)
+                                    .then(trackAttributes =>{
+                                        GetBPMFileLocationByBPM(JSON.parse(trackAttributes).tempo)
+                                            .then(bpmLink => {
+                                                resolve({bpmLink,track})
+                                            })
+                                    })
                                 })
-                        })
-                })
+                        } else {
+                            getBPMInfo(track, access_token)
+                            .then(trackAttributes =>{
+                                GetBPMFileLocationByBPM(JSON.parse(trackAttributes).tempo)
+                                    .then(bpmLink => {
+                                        resolve({bpmLink,track})
+                                    })
+                            })
+                        }
+                        
+                    })
+            }
         })
     })
     
+}
+
+var removeWordOrPhrase = (input, wordToRemove) => {
+    input = input.toLowerCase().trim()
+    var found = input.match(wordToRemove.toLowerCase())
+    if(input.length > 0 && found)
+    {
+        return removeWordBy(input.slice(0, found.index) + input.slice(found.index + wordToRemove.length))
+    } else {
+        return input.trim();
+    }
 }
 
 var getSpotifyCreds = function(){

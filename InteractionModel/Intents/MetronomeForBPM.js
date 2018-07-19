@@ -19,4 +19,4 @@ var MetronomeForBPM = {
     }
 }
 
-module.exports = MetronomeForBPM
+// module.exports = MetronomeForBPM
