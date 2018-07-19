@@ -13,6 +13,7 @@ var GetBPMFileLocationBySong = function(Context){
                 getTrackId(Context.args.songTitle, Context.args.artist, access_token)
                     .then(res => {
                         var track = JSON.parse(res).tracks.items[0]
+                        if(!track) return reject()
                         getBPMInfo(track, access_token)
                             .then(trackAttributes =>{
                                 GetBPMFileLocationByBPM(JSON.parse(trackAttributes).tempo)
@@ -33,21 +34,23 @@ var GetBPMFileLocationBySong = function(Context){
                             getTrackId(retryString, '', access_token)
                                 .then(res => {
                                     var track = JSON.parse(res).tracks.items[0]
+                                    if(!track) return reject()
                                     getBPMInfo(track, access_token)
                                     .then(trackAttributes =>{
                                         GetBPMFileLocationByBPM(JSON.parse(trackAttributes).tempo)
-                                            .then(bpmLink => {
-                                                resolve({bpmLink,track})
-                                            })
-                                    })
-                                })
-                        } else {
-                            getBPMInfo(track, access_token)
-                            .then(trackAttributes =>{
-                                GetBPMFileLocationByBPM(JSON.parse(trackAttributes).tempo)
                                     .then(bpmLink => {
                                         resolve({bpmLink,track})
                                     })
+                                    })
+                                })
+                        } else {
+                            if(!track) return reject()
+                            getBPMInfo(track, access_token)
+                            .then(trackAttributes =>{
+                                GetBPMFileLocationByBPM(JSON.parse(trackAttributes).tempo)
+                                .then(bpmLink => {
+                                    resolve({bpmLink,track})
+                                })
                             })
                         }
                         
@@ -63,7 +66,7 @@ var removeWordOrPhrase = (input, wordToRemove) => {
     var found = input.match(wordToRemove.toLowerCase())
     if(input.length > 0 && found)
     {
-        return removeWordBy(input.slice(0, found.index) + input.slice(found.index + wordToRemove.length))
+        return removeWordOrPhrase(input.slice(0, found.index) + input.slice(found.index + wordToRemove.length), wordToRemove)
     } else {
         return input.trim();
     }
